@@ -102,6 +102,15 @@ jobs:
       #     username: ${{ secrets.DOCKERHUB_USERNAME }}
       #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Debug metadata inputs
+        run: |
+          echo "==== Debug Info ===="
+          echo "Event name: ${{ github.event_name }}"
+          echo "Release tag input: ${{ inputs.release_tag }}"
+          echo "Release tag is empty: ${{ inputs.release_tag == '' }}"
+          echo "Event name is workflow_dispatch: ${{ github.event_name == 'workflow_dispatch' }}"
+          echo "===================="
+      
       - name: Extract metadata for GHCR
         id: meta-ghcr
         uses: docker/metadata-action@v5
@@ -113,6 +122,14 @@ jobs:
             type=raw,value=${{ inputs.release_tag }},enable=${{ github.event_name == 'workflow_dispatch' }}
             type=sha,format=short
             type=sha,format=long
+
+      - name: Print generated tags
+        run: |
+          echo "==== Generated Tags ===="
+          echo "${{ steps.meta-ghcr.outputs.tags }}"
+          echo "==== Labels ===="
+          echo "${{ steps.meta-ghcr.outputs.labels }}"
+          echo "========================"      
 
       # - name: Extract metadata for Docker Hub
       #   if: ${{ env.HAS_DOCKERHUB_TOKEN == 'true' && env.HAS_DOCKERHUB_USERNAME == 'true' }}
